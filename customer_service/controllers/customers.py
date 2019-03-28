@@ -49,6 +49,20 @@ def create_customer():
                    surname=customer.surname), HTTPStatus.CREATED
 
 
+@customers.route('/<string:customer_id>', methods=['PUT'])
+def update_surname(customer_id):
+    customer_repository = current_app.customer_repository
+
+    if not request.is_json:
+        raise ContentTypeError()
+
+    body = request.get_json()
+
+    commands.update_customer_surname(int(customer_id), body['surname'], customer_repository)
+
+    return jsonify(customerId=str(customer_id)), HTTPStatus.OK
+
+
 @customers.errorhandler(CustomerNotFound)
 def customer_not_found(e):
     return jsonify(dict(message='Customer not found')), HTTPStatus.NOT_FOUND
@@ -67,3 +81,14 @@ class ContentTypeError(RuntimeError):
 def content_type_error(e):
     return jsonify(dict(message='Request must be application/json')), \
            HTTPStatus.UNSUPPORTED_MEDIA_TYPE
+
+
+
+
+
+def thing_to_call():
+    return 'real value'
+
+
+def thing_to_test(value):
+    return thing_to_call(str(value))

@@ -18,4 +18,5 @@ def fetch_customer_by_context_id(context, name):
 
     assert response.status_code == 200, response.status_code
     customer = response.get_json()
-    assert f"{customer['firstName']} {customer['surname']}" == name
+    name_to_check = f"{customer['firstName']} {customer['surname']}"
+    assert name_to_check == name, name_to_check

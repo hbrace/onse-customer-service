@@ -3,8 +3,18 @@ from unittest.mock import patch
 
 import pytest
 
+from customer_service.controllers.customers import thing_to_test
 from customer_service.model.customer import Customer
 from customer_service.model.errors import CustomerNotFound
+
+@patch('customer_service.controllers.customers.thing_to_call')
+def test_patch(thing_to_call):
+    thing_to_call.return_value = 10
+
+    assert thing_to_test(99) == 10
+
+    thing_to_call.assert_called_with('99')
+
 
 
 @patch('customer_service.model.commands.get_customer')
@@ -60,6 +70,23 @@ def test_create_customer(create_customer, web_client, customer_repository):
         firstName='Jez',
         surname='Humble',
         customerId='None')  # ID isNone because call is mocked
+
+
+@patch('customer_service.model.commands.update_customer_surname')
+def test_update_customer_surname(update_customer_surname, web_client, customer_repository):
+    update_customer_surname.return_value = dict(customerId='12345')
+
+    request_body = dict(firstName='Gene', surname='Jones')
+
+    response = web_client.put(f'/customers/12345', json=request_body)
+
+    update_customer_surname.assert_called_with(12345, 'Jones', customer_repository)
+    assert response.is_json
+    assert response.status_code == 200
+    # assert response.get_json() == dict(customerId='12345',
+    #                                    firstName='Gene',
+    #                                    surname='Jones')
+    # # assert response.get_json() == dict(message='Customer not found')
 
 
 @pytest.mark.parametrize(
